@@ -26,6 +26,11 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython virtualenv 
 
+      - name: Install Android SDK & AIDL
+        run: |
+          sudo apt install -y android-sdk
+          sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"
+
       - name: Build APK
         run: buildozer -v android debug
 
