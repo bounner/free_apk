@@ -1,4 +1,4 @@
-import sqlite3, webbrowser
+import sqlite3
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.metrics import dp
@@ -8,7 +8,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
-# --- Base de données ---
+# --- Database ---
 class DatabaseHelper:
     def __init__(self, db_name="OrangeApp.db"):
         self.conn = sqlite3.connect(db_name)
@@ -29,7 +29,7 @@ class DatabaseHelper:
         row = cursor.fetchone()
         return row is not None
 
-# --- Modèles de données ---
+# --- Models ---
 class Level:
     def __init__(self, id, price, forfait):
         self.id = id
@@ -41,7 +41,7 @@ class Operator:
         self.name = name
         self.levels = levels
 
-# --- Écrans ---
+# --- Screens ---
 class LoginScreen(Screen):
     def register(self):
         username = self.ids.username.text.strip()
@@ -68,7 +68,6 @@ class LoginScreen(Screen):
 
 class MainScreen(Screen):
     def on_enter(self):
-        # Définir la liste des opérateurs et niveaux
         self.operators = [
             Operator("MTN CM", [Level(1, 10, "500 Mo - 500 FCFA"),
                                 Level(2, 20, "1 Go - 1000 FCFA"),
@@ -82,7 +81,6 @@ class MainScreen(Screen):
                                         Level(2, 22, "1.2 Go - 1200 FCFA")])
         ]
         rv = self.ids.operator_rv
-        # Mettre à jour le RecycleView avec les noms des opérateurs
         rv.data = [{'text': op.name, 'on_release': lambda op=op: self.show_levels_dialog(op)} for op in self.operators]
     
     def show_levels_dialog(self, operator):
@@ -114,7 +112,7 @@ class MainScreen(Screen):
         btn = Button(text="OK", size_hint_y=None, height=dp(40))
         content.add_widget(btn)
         redirect_popup = Popup(title="Redirection", content=content, size_hint=(0.8, 0.5))
-        btn.bind(on_release=lambda instance: (redirect_popup.dismiss(), webbrowser.open("https://t.me/AdminOrangeCMR")))
+        btn.bind(on_release=lambda instance: redirect_popup.dismiss())  # No webbrowser on GitHub
         redirect_popup.open()
     
     def show_note(self):
@@ -133,7 +131,7 @@ class MainScreen(Screen):
         btn.bind(on_release=lambda instance: note_popup.dismiss())
         note_popup.open()
 
-# --- Layout KV ---
+# --- KV Layout ---
 kv = '''
 ScreenManager:
     LoginScreen:
@@ -183,9 +181,7 @@ ScreenManager:
 
 class MyApp(App):
     def build(self):
-        # Charger le layout KV
         sm = Builder.load_string(kv)
-        # Associer DatabaseHelper au ScreenManager pour un accès facile
         sm.db_helper = DatabaseHelper()
         return sm
 

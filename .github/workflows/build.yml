@@ -24,7 +24,7 @@ jobs:
           sudo apt update
           sudo apt install -y git zip unzip openjdk-17-jdk wget curl
           pip install --upgrade pip
-          pip install buildozer cython virtualenv 
+          pip install buildozer cython virtualenv
 
       - name: Install Android SDK
         run: |
@@ -35,7 +35,9 @@ jobs:
           mkdir -p $ANDROID_HOME/cmdline-tools
           cd $ANDROID_HOME/cmdline-tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O sdk-tools.zip
-          unzip sdk-tools.zip -d latest
+          unzip sdk-tools.zip -d temp
+          mv temp/cmdline-tools latest
+          rm -r temp
           rm sdk-tools.zip
 
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
