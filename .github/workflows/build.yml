@@ -1,0 +1,40 @@
+name: Build APK with Buildozer
+
+on:
+  push:
+    branches:
+      - main  # Lance l'action à chaque push sur main
+  workflow_dispatch:  # Permet de lancer manuellement depuis GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Utilise un serveur Linux GitHub
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Récupère ton code source
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt install -y \
+            git python3 python3-pip openjdk-17-jdk \
+            autoconf automake build-essential ccache cmake libffi-dev \
+            libltdl-dev libssl-dev libtool pkg-config python3-pip \
+            python3-venv zip unzip zlib1g-dev
+          pip install --upgrade --user buildozer cython virtualenv
+
+      - name: Build APK
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          buildozer -v android debug
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: free_apk
+          path: bin/*.apk
